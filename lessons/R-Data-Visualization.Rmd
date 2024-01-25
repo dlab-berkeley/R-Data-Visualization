@@ -48,11 +48,11 @@ Visualization is meant to convey information.
 
 That said, to accurately and efficiently communicate the information hidden within the data, we should also be aware of the common pitfalls of data visualization.
 
-It's always good to sit back and ask ourseleves:
+It's always good to sit back and ask ourselves:
 
 -   Does the plot include sufficient text descriptions (e.g. labels, legend, and title)?
 
--   Does the plot has an approriate size and scale?
+-   Does the plot has an appropriate size and scale?
 
 -   Does the plot contain too much or too little data?
 
@@ -93,7 +93,7 @@ gap <- read.csv("../data/gapminder-FiveYearData.csv", stringsAsFactors = TRUE)
 head(gap)
 ```
 
-# Why visualize?
+# 🎬 **Demo**: Why visualize?
 
 Say you want to answer: how has life expectancy changed over time in Europe?
 
@@ -153,7 +153,7 @@ A plot using `ggplot()` is comprised of three fundamental building blocks:
 
 One thing to remember is that `ggplot2` works in layers, similar to software such as Photoshop. We create a base layer, and then stack layers on top of that base layer. New layers are added to a plot using the addition **`+`** symbol. Lastly, plots can be further customized using a host of **"theme\_"** functions.
 
-## Histograms
+# Histograms
 
 We'll demonstrate the layer-based approach in `ggplot2` by building a histogram of life expectancy globally.
 
@@ -223,12 +223,16 @@ ggplot(data = gap, aes(x = lifeExp)) +
 
 ## 🥊 Challenge 1: Histograms in ggplot()
 
-Using data on people's heart health, create a histogram of cholesterol (variable = `chol`). Use the functions above to make your plot more informative.
+For the challenges we will use data from the American Community Survey (ACS), an annual survey conducted by the Census. The ACS samples every 1 in 100 households and asks questions on people's jobs, income, food security, relationships etc. You can explore the data at IPUMS USA: <https://usa.ipums.org/usa/>. Social scientists typically refer to data about individual people as "micro" data.
+
+We have a sample of people from the 2022 ACS with variables on their job type, income, age and education. Using this data, create histogram of income (variable = `income`). Use the functions above to make your plot more informative.
+
+**🔔 Question:** What do you learn about the distribution of income from this plot?
 
 ```{r}
 
 # read in data
-d <- read.csv("../data/heart.csv")
+d <- readRDS("../data/ACS_age_income.rds")
 
 # explore data
 head(d)
@@ -237,7 +241,7 @@ head(d)
 
 ```
 
-## Bar chart
+# Bar chart
 
 Bar charts are useful to visualize counts and averages of a single continuous variable. For example, we can use a bar chart to learn how many countries there are per continent that we have data for.
 
@@ -287,7 +291,7 @@ gap |>
 
 **⚠️ Warning:** `geom_bar()` was quicker here because we wanted to our y-axis to be the count of rows per continent. However, if we wanted our y-axis to be something else (say the average life expectancy per continent) we would need to calculate that ourselves in a new dataframe and use `geom_col()`.
 
-## Boxplots
+# Boxplots
 
 Boxplots are useful to visualize the distribution of a single continuous variable and make comparisons across groups. Say we want to compare the distribution of life expectancy across countries by continent in 2007.
 
@@ -314,12 +318,12 @@ gap |>
 
 ## 🥊 Challenge 2: Boxplots in ggplot()
 
-Using data on people's heart health, create a boxplot of cholesterol (variable = `chol`) based on patient self-described sex (variable = `sex`). Use the functions above to make your plot more informative.
+Using the ACS data from challenge 1 on people's income and education, create a boxplot of income (variable = `income`) by education level (variable = `educ`). Use the functions above to make your plot more informative.
 
 ```{r}
 
 # read in data
-d <- read.csv("../data/heart.csv")
+d <- readRDS("../data/ACS_age_income.rds")
 
 # explore data
 head(d)
@@ -328,9 +332,11 @@ head(d)
 
 ```
 
-## Scatter plots
+**🔔 Question:** What do you learn from this plot about the relationship between income and education? Do you think the plot is helpful? Would you change anything about it?
 
-One takeaway from the previous plot is that continents with lower GDP, such as Africa, have lower life expectancy. We can explore this pattern further using scatter plots. Scatter plots are useful for visualizing the relationship between two numeric quantities. Typically, these quantities are continuous, but scatterplots can sometimes effectively convey comparisons of discrete quantities as well.
+# Scatter plots
+
+One takeaway from the previous plot is that continents with lower GDP, such as Africa, have lower life expectancy. We can explore this pattern further using scatter plots. Scatter plots are useful for visualizing the relationship between two numeric quantities. Typically, these quantities are continuous, but scatter plots can sometimes effectively convey comparisons of discrete quantities as well.
 
 Let's examine life expectancy by GDP per capita in 2007. We use the same layering approach as before, but changing to geom to `geom_point()`.
 
@@ -529,86 +535,93 @@ Note here how we commented out the `scale_x_continuous` code because it is not r
 
 🔔 **Question**: Comparing this plot to the original plot above (which both use the same data), does the logged plot draw attention to things missed by the un-logged plot? Or vice versa?
 
-## 🥊 Challenge 3: Scatter plot
+## 🥊 Challenge 3: Scatter plots
 
-IDEA: challenge 3 (might be 4) is more complicated - start with scatter plot of age vs income --\> unhelpful b/c data is micro data - then, what could we do? two options - (1) calculate average income by age and then make scatter plot (want to bring in this concept of doing data wrangling first before plotting above in scatter plot section) - (2) use geom_smooth to do it for you
+Using the ACS data, create a scatter plot that visualizes the relationship between age (x-axis) and income (y-axis) by education (point color or shape).
 
-FILL IN
+### Part 1 - scatter plot
+
+First, read in the data and explore what variables and observations you have (hint: functions like `View()`, `glimpse()`, and `colnames()` might be helpful here).
 
 ```{r}
-d <- readRDS("../../R-Data-Wrangling-Pilot/data/part1_data.rds")
+# read in new data on people's age and income
+d <- readRDS("../data/ACS_age_income.rds")
+
+```
+
+Second, create a scatter plot with age on the x-axis, income on the y-axis, and education as an aesthetic.
+
+```{r}
 
 d |>
-  ggplot(aes(x = age, y = income, color = educ)) +
-  geom_smooth() +
-  theme_classic()
+  # YOUR CODE HERE
 
 
 ```
 
-OLD
+🔔 **Question**: What is wrong with the plot you just created? Does it help you understand the relationship between age and income? Why not?
 
-## Facets
+### Part 2 - data wrangling then plotting
 
-Bring in facets - could be a demo --\> by sex
+The first scatter plot was unhelpful because we plotted every person in our data and we can't distill any trends from the mess of points. To make this visualization more helpful, we need to do some data wrangling.
 
-## Subplots with a facet wrap
+Use `summarize()` and `group_by()` to calculate the average income by age and education level. Then make a new scatter plot that plots the average income (y-axis) by age (x-axis) for different education levels (color).
 
-An alternative approach to showing the previous plot is to separate each of the individual curves into their own subplots. This can be done with a `facet_wrap`, in which we choose a variable (i.e., a facet) by which to split the plot into individual subplots:
+💡 **Tip:** We used `group_by()` and `summarize()` above under "Demo: Why visualize?" and "Bar charts". Scroll up to that code for a refresher on how to use these functions if you're unsure.
 
-```{r facet_wrap}
-facet_line <- line + 
-  facet_wrap(~continent) + 
-  guides(linetype = "none") + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-print(facet_line)
+Once you're satisfied with your plot, you can add titles and axis labels to make it more informative.
+
+```{r}
+
+# first, create a dataframe with average income by age and education 
+d_avg_inc <- 
+  
+  
+# second, use that in a new scatter plot
+d_avg_inc |>
+
+
 ```
 
-A word about the colors here. While these colors are arguably distinct, it's not the case that the base colors necessarily will be. It's estimated that, "globally, 1 in 12 males and 1 in 200 females are colorblind." The most common form of color blindness is red-green color blindness. **Viridis** is a color palette with an emphasis on accessibility for those of us who experience colorblindness.
+🔔 **Question**: What do you learn from this plot about the differences by education in the relationship between age and income?
 
-To show the difference with a colorblind friendly palette, let's remake the same `facet_line` chart.
+# 🎬 **Demo**: Facets
 
-```{r, facet_colorblind}
-facet_line_cb <- line + 
-  facet_wrap(~continent) + 
-  guides(linetype = "none") + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_color_viridis_d()
-print(facet_line_cb)
+In Challenge 3 we plotted age against income by education, where each education level was a different color on the plot. This is helpful for comparing relationships across groups but the plots can also become crowded and hard to read. An alternative is to create multiple plots, one for each education level. These are called **facets**.
+
+```{r}
+d <- readRDS("../data/ACS_age_income.rds")
+
+# create a scatter plot showing the relationship between age and income
+# show it for different facets by education 
+d |>
+  group_by(age, educ) |>
+  summarize(avg_income = mean(income, na.rm = T)) |>
+  # NOTE: we have removed education from the aes()
+  ggplot(aes(x = age, y = avg_income)) +
+  geom_point() +
+  # NOW: create subplots by education - override default nrow to make them all in a line
+  facet_wrap(~educ, nrow = 1) +
+  theme_bw() +
+  ggtitle("Average Income by Age for Education Levels") +
+  xlab("Age") +
+  ylab("Avergae Income ($)")
+
 ```
 
-Note that we have overridden the default colors from our line graph and replaced them with a colorblind friendly palette. Every line color is now clearly distinct for users.
+💡 **Tip:** When using `facet_wrap`, the code for the plots is applied to each facet. For example, changes you make to the axis or scales will apply to each subplot.
 
-> **Challenge 4:** Open `R-Data-Visualization-Challenges.Rmd`. Create a line plot of the mean cholesterol for each age, separated by sex using the heart data. You will need to do some data manipulation with `dplyr` to make this plot. Save your plot to a variable named `D`.
+# Takeaways
 
-# Exporting
+1.  Visualizing data is an effective way to find patterns and tell stories
 
-Exporting graphs in R is straightforward. Start by clicking the "Export" button:
+2.  `ggplot()` can be used to create many types of plots and is highly customizable
 
-1.  Click **Copy to clipboard...** if you want to quickly copy/paste a figure into a slideshow presentation or text document.
+3.  Plotting usually requires some degree of data wrangling first to get the specific values/statistics that you want to visualize
 
-2.  Click **Save as image...** (Raster/Bitmap formats such as .png, .jpeg, .tiff) if you want to explort to this format.
+# Next Steps...
 
-> NOTE: Not recommended because every pixel of a plot contains its own separate coding; not so great if you want to resize the image
-
-3.  Click **Save as PDF...** (Vector format such as .pdf, .ps) to export to .pdf.
-
-> NOTE: Recommended! Every element of a plot is encoded with a function that gives its coding conditional on several factors, which makes it great for resizing.
-
-4.  Or, **export with `ggsave`**
-
-```{r eval = FALSE}
-ggsave(filename = "../images/compound.pdf",
-       plot = compound, 
-       width = 12,
-       height = 8,
-       units = "in",
-       dpi = 600)
-```
-
-> **Challenge 5:** Open `R-Data-Visualization-Challenges.Rmd`. Use `cowplot` to create a compound figure named `compound_figure` that contains subplots `A`, `B`, `C`, and `D` that you created above.
-
-# Resources for data visualization
+Another form of visualization is making maps, which help with geospatial analysis. You can take DLab's [R Geospatial Fundamentals](https://github.com/dlab-berkeley/R-Geospatial-Fundamentals) [links to old repo] to learn more.
 
 Here, we provide some useful resources that may deepen your data visualization skills:
 
