@@ -1,0 +1,631 @@
+---
+title: "R Data Visualization"
+theme: readable
+output:
+  html_document: 
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    fig_width: 12
+    fig_height: 7
+---
+
+# D-Lab: R Data Visualization
+
+📝 **Poll**: Have you attended a D-Lab workshop before? Answer in the zoom poll.
+
+## Learning Objectives
+
+Welcome to R Data Visualization. Our goals for today's workshop are:
+
+1.  Identify instances when visualization helps with analysis and understanding
+
+2.  Understand the general principles and common pitfalls of data visualization
+
+3.  Learn the `ggplot` functions for creating data visualizations
+
+Throughout this workshop series, we will use the following icons:
+
+🔔 **Question**: A quick question to help you understand what's going on.
+
+🥊 **Challenge**: Interactive exercise. We'll go through these in the workshop!
+
+⚠️ **Warning**: Heads-up about tricky stuff or common mistakes.
+
+💡 **Tip**: How to do something a bit more efficiently or effectively.
+
+📝 **Poll**: A zoom poll to help you learn.
+
+🎬 **Demo**: Showing off something more advanced so you know what you can use R for in the future
+
+## Principles of Data Visualization
+
+Visualization is meant to convey information.
+
+> The power of a graph is its ability to enable one to take in the quantitative information, organize it, and see patterns and structure not readily revealed by other means of studying the data.
+
+\- Cleveland and McGill, 1984
+
+That said, to accurately and efficiently communicate the information hidden within the data, we should also be aware of the common pitfalls of data visualization.
+
+It's always good to sit back and ask ourseleves:
+
+-   Does the plot include sufficient text descriptions (e.g. labels, legend, and title)?
+
+-   Does the plot has an approriate size and scale?
+
+-   Does the plot contain too much or too little data?
+
+-   Does the plot include a common scale for group comparison?
+
+-   And does the chosen color contrast accurately convey the differences?
+
+The answers to these questions vary depending on the data we have and the message we want to convey through the plot.
+
+Throughout the workshop, we will discuss the decisions we need to make when encountering such questions, as well as the solutions to address them.
+
+# Plotting in R
+
+The most common set of tools for creating plots in R is `ggplot2`, which we will use throughout this workshop.
+
+Base graphics (which comes with all R installations) can also be used, but the code is not as intuitive. There are also other packages (notably, `lattice`) but `ggplot2` is by far the most widely used. Check out [this post](https://stackoverflow.com/questions/2759556/r-what-are-the-pros-and-cons-of-using-lattice-versus-ggplot2) on comparisons between base, `ggplot2`, and `lattice` graphics to learn more.
+
+💡 **Tip**: We will use a lot of different code for creating and customizing plots in this workshop. It is not important to remember any of this code! Google and chatGPT (and such things) are the best tools to have when creating plots in R and you will likely see the instructors use them if you ask questions. The main things you want to remember from this workshop is the general structure of the code and what code terms refer to which parts of the plot. This will make Googling easier.
+
+## Package installation
+
+First, we'll install and import the necessary packages. The `tidyverse` suite of packages contains the two libraries we want: `ggplot2`, which contains all the plotting functions, and `dplyr`, which contains all the data wrangling functions.
+
+If you haven't already installed `tidyverse`, install it now by un-commenting the line before. Then everyone should load it in.
+
+```{r import, message=F, warning = F}
+# Uncomment this to install packages, if necessary.
+# install.packages("tidyverse)
+library(tidyverse)
+```
+
+## Dataset details
+
+For the following examples, we will using the gapminder dataset. Gapminder is a country-year dataset with information on life expectancy and GDP per-capita. Check out more on gapminder in this [Github repository](https://github.com/jennybc/gapminder).
+
+```{r import_gap}
+gap <- read.csv("../data/gapminder-FiveYearData.csv", stringsAsFactors = TRUE)
+head(gap)
+```
+
+# Why visualize?
+
+Say you want to answer: how has life expectancy changed over time in Europe?
+
+We could look at some summary statistics:
+
+```{r}
+
+gap |>
+  filter(continent == "Europe") |>
+  # calculate average life expectancy per year in Europe
+  group_by(year) |>
+  summarize(avg_life = mean(lifeExp))
+
+```
+
+We see the average life expectancy in Europe is increasing, but what about variation across countries? We could add another summary statistic.
+
+```{r}
+gap |>
+  filter(continent == "Europe") |>
+  # calculate average life expectancy per year in Europe
+  group_by(year) |>
+  summarize(avg_life = mean(lifeExp),
+            var_life = var(lifeExp))
+```
+
+The variation column is valuable information but presenting it in a table is hard to read and interpret. People are better at looking at visual patterns than digesting lots of numbers. We can convey the same information in a scatter plot.
+
+```{r}
+
+gap |>
+  filter(continent == "Europe") |>
+  ggplot() +
+  geom_point(aes(x = year, y = lifeExp)) +
+  xlab("Year") +
+  ylab("Life Expectancy") +
+  ggtitle("Life Expectancy in Europe") +
+  theme_bw()
+
+```
+
+**🔔 Question:** What are some takeaways you get from this plot? What questions does it prompt you to ask about our data?
+
+By the end of today's workshop, you will be able to make visualizations like this!
+
+# Using `ggplot2`
+
+Base-R provides graphical capabilities, but there is a package in R that does plotting much more effectively and is overwhelmingly used by researchers. This package is called `ggplot2`, inspired by Leland Wilkinson's **g**rammar of **g**raphics.
+
+**⚠️ Warning:** `ggplot2` is the name of the package, but `ggplot()` is the main function call. This can cause some confusion.
+
+A plot using `ggplot()` is comprised of three fundamental building blocks:
+
+1.  **Data:** typically a dataframe (passed as an argument to `ggplot(data = )` in the code)
+2.  **Aesthetics:** to define your x and y axes, map colors to factor levels, etc. (denoted by `aes()` in the code)
+3.  **Geometric object:** the visual marks to represent your data - points, bars, lines, ribbons, polygons, etc. (denoted by `geom_` in the code)
+
+One thing to remember is that `ggplot2` works in layers, similar to software such as Photoshop. We create a base layer, and then stack layers on top of that base layer. New layers are added to a plot using the addition **`+`** symbol. Lastly, plots can be further customized using a host of **"theme\_"** functions.
+
+## Histograms
+
+We'll demonstrate the layer-based approach in `ggplot2` by building a histogram of life expectancy globally.
+
+💡 **Tip**: Before creating a plot, it is so helpful to make a quick sketch of the plot that you want on paper.
+
+Histograms are useful to illustrate the distribution of a single continuous (i.e., numeric or integer) variable. In the gapminder dataset, the histogram is a natural choice for visualizing `lifeExp`:
+
+### Step 1: Define the base layer
+
+First, to construct the base layer, we pass in two arguments to the `ggplot` function: the data and the global aesthetics (the ones that apply to all layers of the plot) defined within `aes()`. Once we do this, we see our coordinate system, but no data!
+
+```{r base_layer}
+ggplot(data = gap, aes(x = lifeExp))
+
+```
+
+### Step 2: Add the histogram layer
+
+We need the last building block: a `geom_` function, which in this case, is `geom_histogram`. Add `geom_histogram` to see the data!
+
+```{r histogram_layer}
+ggplot(data = gap, aes(x = lifeExp)) + 
+  geom_histogram()
+```
+
+`ggplot` prints a note when using `geom_histogram` that the default number of bins is 30. We can eliminate that note by setting explicitly the number of bins to any number. Here we picked `bins=30` to replicate the default behavior.
+
+```{r}
+ggplot(data = gap, aes(x = lifeExp)) + 
+  geom_histogram(bins = 30)
+
+```
+
+Note that we can also make a density plot with a similar structure as a histogram. A density plot computes a kernel density estimate, which you can think of as the smoothed version of the histogram. We like using them when we have continuous data that comes from a smooth distribution.
+
+```{r density_layer}
+ggplot(data = gap, aes(x=lifeExp)) +
+  geom_density()
+```
+
+💡 **Tip**: Note that the only difference we made between the histogram and the density plot was changing which geom\_\* we used. All ggplots have the same basic syntax with minor modifications.
+
+### Step 3: Customize with theme layers
+
+Themes in `ggplot2` are top-level layers which can be use to stylize and customize plots. These themes contain many components, which can be used to change every part of the plot, including the fonts, label sizes, label placements, and more. `ggplot2` comes with some built-in themes that you can easily add to a plot to give it a clean, recognizable, and consistent style. One of the most commonly used themes is a black and white theme, denoted by `theme_bw()`:
+
+```{r hist_w_theme}
+ggplot(data = gap, aes(x = lifeExp)) + 
+  geom_histogram(color = "black", 
+                 fill = "gray80", 
+                 bins = 30) + 
+  theme_bw()
+```
+
+We can also use label and title layers to customize the axis and title labels.
+
+```{r hist_w_labels}
+ggplot(data = gap, aes(x = lifeExp)) + 
+  geom_histogram(color = "black", 
+                 fill = "gray80", 
+                 bins = 30) + 
+  theme_bw() + 
+  ggtitle("Histogram of Life Expectancy") + 
+  xlab("Years") + 
+  ylab("Frequency") 
+```
+
+## 🥊 Challenge 1: Histograms in ggplot()
+
+Using data on people's heart health, create a histogram of cholesterol (variable = `chol`). Use the functions above to make your plot more informative.
+
+```{r}
+
+# read in data
+d <- read.csv("../data/heart.csv")
+
+# explore data
+head(d)
+
+# create histogram - your code here
+
+```
+
+## Bar chart
+
+Bar charts are useful to visualize counts and averages of a single continuous variable. For example, we can use a bar chart to learn how many countries there are per continent that we have data for.
+
+We want the height of the bars to equal the number of countries per continent in our data. First, we need to calculate this number.
+
+💡 **Tip**: A lot of the times you need to do some degree of data wrangling before plotting. Always ask, what values do you want to display on the plot and how can I calculate those in a dataframe *before* making my plot? DLab's [R Data Wrangling](https://github.com/dlab-berkeley/R-Data-Wrangling-Pilot) goes over many of the functions to do this.
+
+```{r}
+
+# calculate the number of countries per continent
+countries_by_continent <- gap |>
+  # limit to a single year so we're not counting the same country multiple times
+  filter(year == 2007) |>
+  # group by continent
+  group_by(continent) |>
+  # count the number of rows - we have one country per row b/c we limited to one year
+  summarize(count = n())
+
+countries_by_continent
+```
+
+Now that we have a dataframe with continents and the number of countries, we can use `geom_col()` to make a bar chart. We take the same layering approach as we did for creating a histogram, but instead of using `geom_histogram()` we use `geom_col()` ("columns").
+
+```{r barplot_ggplot}
+              
+ggplot(countries_by_continent, aes(x = continent, y = count)) +
+  geom_col() + 
+  theme_bw() + 
+  xlab("Continent") +
+  ylab("Number of Countries") +
+  ggtitle("Number of Countries per Continent")
+```
+
+`geom_col()` required us to have a variable for the y-axis (the height of the bars - in our case equal to the number of countries per continent). The geom `geom_bar()` allows us to skip the step of creating this y-axis variable, because it plots the number of rows per group as the height of each bar.
+
+```{r geom_bar}
+gap |>
+  filter(year == 2007) |>
+  ggplot(aes(x = continent)) +
+  geom_bar() + 
+  theme_bw() + 
+  xlab("Continent") +
+  ylab("Number of Countries") +
+  ggtitle("Number of Countries per Continent")
+
+```
+
+**⚠️ Warning:** `geom_bar()` was quicker here because we wanted to our y-axis to be the count of rows per continent. However, if we wanted our y-axis to be something else (say the average life expectancy per continent) we would need to calculate that ourselves in a new dataframe and use `geom_col()`.
+
+## Boxplots
+
+Boxplots are useful to visualize the distribution of a single continuous variable and make comparisons across groups. Say we want to compare the distribution of life expectancy across countries by continent in 2007.
+
+```{r}
+gap |>
+  filter(year == 2007) |>
+  ggplot(aes(x = continent, y = lifeExp)) + 
+  geom_boxplot()
+
+```
+
+🔔 **Question**: What are some takeaways from this plot? How could we make it more visually informative?
+
+```{r}
+gap |>
+  filter(year == 2007) |>
+  ggplot(aes(x = continent, y = lifeExp)) + 
+  geom_boxplot() +
+  ggtitle("Life Expectancy in 2007 by Continent") +
+  xlab("Continent") +
+  ylab("Life Expectancy") +
+  theme_bw()
+```
+
+## 🥊 Challenge 2: Boxplots in ggplot()
+
+Using data on people's heart health, create a boxplot of cholesterol (variable = `chol`) based on patient self-described sex (variable = `sex`). Use the functions above to make your plot more informative.
+
+```{r}
+
+# read in data
+d <- read.csv("../data/heart.csv")
+
+# explore data
+head(d)
+
+# create boxplot - your code here
+
+```
+
+## Scatter plots
+
+One takeaway from the previous plot is that continents with lower GDP, such as Africa, have lower life expectancy. We can explore this pattern further using scatter plots. Scatter plots are useful for visualizing the relationship between two numeric quantities. Typically, these quantities are continuous, but scatterplots can sometimes effectively convey comparisons of discrete quantities as well.
+
+Let's examine life expectancy by GDP per capita in 2007. We use the same layering approach as before, but changing to geom to `geom_point()`.
+
+```{r scatter_ggplot}
+
+gap |>
+  # limit to year 2007
+  filter(year == 2007) |>
+  # specific the x and y axis
+  ggplot(aes(x = gdpPercap, y = lifeExp)) + 
+  # specific the geom
+  geom_point() + 
+  theme_bw()
+```
+
+We can add another dimension to our plot by coloring the points based on which continent they belong to. To do this, we use the `color` argument in `aes()`.
+
+💡 **Tip**: This is a key idea: the aesthetic captures the relationships amongst the data, while the geometry specifies how they're visualized.
+
+```{r}
+
+gap |>
+  # limit to year 2007
+  filter(year == 2007) |>
+  # specific the x and y axis AND THE COLOR
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent)) + 
+  # specific the geom
+  geom_point() + 
+  theme_bw()
+
+```
+
+🔔 **Question**: What patterns does adding color (a third dimension) allow us to see in our data that we didn't before?
+
+# Customizing Plots
+
+Often we want to change the appearance of plots to make them more readable or prepare them for a specific purpose (a presentation, a journal article etc.). `ggplot()` is *highly* customizable. We will go over a few common modifications.
+
+⚠️ **Warning**: The code starts to get longer and longer - this isn't because it is more complicated, but instead because we are adding more customizations. It is not necessary to remember it all (or any of it) but instead try to understand the grammar, aka why code goes where it does.
+
+In the following code, the new lines of code will be CAPITALIZED.
+
+💡 **Tip**: When you want to make changes to a plot Googling or asking chatGPT is a great start. Websites like [this](https://r-graph-gallery.com/index.html) provide examples of plots and the underlying code.
+
+## Titles
+
+Adding titles to the axis and the plot, as well as source notes, adds valuable information.
+
+```{r}
+
+# make the same scatter plot as before 
+gap |>
+  # limit to year 2007
+  filter(year == 2007) |>
+  # specific the x and y axis and the color 
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent)) + 
+  # specific the geom
+  geom_point() + 
+  theme_bw() +
+  # ADD A TITLE
+  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # ADD AN X-AXIS AND A Y-AXIS
+  xlab("GDP per capita (dollars)") +
+  ylab("Life Expectancy (years)") +
+  # ADD SOURCE NOTES
+  labs(caption = "Source: Gap Minder")
+ 
+```
+
+## `aesthetics`
+
+Adding a `color` argument to `aes()` allowed us to distinguish between continents. We can also use the shape of points to make it more visually clear that these are countries in different continents.
+
+```{r}
+
+# make the same scatter plot as before 
+gap |>
+  # limit to year 2007
+  filter(year == 2007) |>
+  # specific the x and y axis and the color AND THE SHAPE
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, shape = continent)) + 
+  # specific the geom
+  geom_point() + 
+  theme_bw() +
+  # add a title
+  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # add an x-axis and y-axis title
+  xlab("GDP per capita (dollars)") +
+  ylab("Life Expectancy (years)") +
+  # add source notes
+  labs(caption = "Source: Gap Minder") 
+
+```
+
+🔔 **Question**: Do you think it was helpful to have two aesthetics (both color and shape) mapping to `continent`?
+
+## Scales
+
+The scales of your plot are important for conveying precise information about the variables. We will discuss two common changes to the defaults.
+
+### Axis breaks and labels
+
+Changing the scale breaks can improve how readable a plot is. In our scatter plot, we have breaks on the x-axis every \$10,000. To make it easier to distinguish between points, we might want to put in more x-axis breaks. Because our axis are both continuous variables, we can control the breaks, as well as the start and end points of a scale, using either `scale_x_continuous` or `scale_y_continuous`. If we were plotting discrete variables, we would instead use `scale_x_discrete` and `scale_y_discrete`.
+
+```{r}
+
+# make the same scatter plot as before 
+gap |>
+  # limit to year 2007
+  filter(year == 2007) |>
+  # specific the x and y axis, the color and the shape
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, shape = continent)) + 
+  # specific the geom
+  geom_point() + 
+  theme_bw() +
+  # add a title
+  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # add an x-axis and y-axis title
+  xlab("GDP per capita (dollars)") +
+  ylab("Life Expectancy (years)") +
+  # add source notes
+  labs(caption = "Source: Gap Minder") +
+  # CHANGE THE X-AXIS BREAKS
+  scale_x_continuous(breaks = seq(from = 0, to = 50000, by = 5000))
+
+
+```
+
+We might also want to change what labels appear by the x-axis markers. For instance, rather than having "10000" we might want "\$10k". We can specify the labels with the `labels` argument inside `scale_x_continuous`.
+
+We need to provide `label` with a vector that has the labels for each tick mark. We can use `paste0` to make this vector.
+
+```{r}
+
+# make a vector with the labels for our x axis
+x_axis_labs <- paste0("$", seq(0, 50, 5), "K")
+x_axis_labs
+
+```
+
+```{r}
+# make the same scatter plot as before 
+gap |>
+  # limit to year 2007
+  filter(year == 2007) |>
+  # specific the x and y axis, the color and the shape
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, shape = continent)) + 
+  # specific the geom
+  geom_point() + 
+  theme_bw() +
+  # add a title
+  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # add an x-axis and y-axis title
+  xlab("GDP per capita (dollars)") +
+  ylab("Life Expectancy (years)") +
+  # add source notes
+  labs(caption = "Source: Gap Minder") +
+  # change the x-axis breaks AND THE LABELS
+  scale_x_continuous(breaks = seq(from = 0, to = 50000, by = 5000),
+                     labels = x_axis_labs)
+```
+
+⚠️ **Warning**: Above we defined the vector `x_axis_labs` and then passed that the to `labels` argument withing `scale_x_continous()`. We could have passed the code for the labels vector straight to `labels`, but defining the vector first makes it easier to change if we decide on a different formatting for the labels.
+
+### Log transformation
+
+Alternatively, we could log transform the x-axis. Logging a variable is helpful if it has a wide-range or is right-skewed (where most of the data points are clustered towards the left and a few large values stretch the tail to the right). Logging a variable compresses the scale of the data, bringing the larger values closer together and stretching out the smaller values. In our case, there are lots of countries with very low GDP per capita (\<5K) and fewer as GDP per capita gets higher (\>30K).
+
+```{r}
+
+# make the same scatter plot as before 
+gap |>
+  # limit to year 2007
+  filter(year == 2007) |>
+  # specific the x and y axis, the color and the shape
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, shape = continent)) + 
+  # specific the geom
+  geom_point() + 
+  theme_bw() +
+  # add a title
+  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # add an x-axis and y-axis title
+  xlab("GDP per capita (dollars)") +
+  ylab("Life Expectancy (years)") +
+  # add source notes
+  labs(caption = "Source: Gap Minder") +
+  ## change the x-axis breaks and the labels
+  # scale_x_continuous(breaks = seq(from = 0, to = 50000, by = 5000),
+  #                    labels = x_axis_labs) +
+  # LOG TRANSFORM THE X-AXIS
+  scale_x_log10()
+
+```
+
+Note here how we commented out the `scale_x_continuous` code because it is not relevant for our log transformed x-axis.
+
+🔔 **Question**: Comparing this plot to the original plot above (which both use the same data), does the logged plot draw attention to things missed by the un-logged plot? Or vice versa?
+
+## 🥊 Challenge 3: Scatter plot
+
+IDEA: challenge 3 (might be 4) is more complicated - start with scatter plot of age vs income --\> unhelpful b/c data is micro data - then, what could we do? two options - (1) calculate average income by age and then make scatter plot (want to bring in this concept of doing data wrangling first before plotting above in scatter plot section) - (2) use geom_smooth to do it for you
+
+FILL IN
+
+```{r}
+d <- readRDS("../../R-Data-Wrangling-Pilot/data/part1_data.rds")
+
+d |>
+  ggplot(aes(x = age, y = income, color = educ)) +
+  geom_smooth() +
+  theme_classic()
+
+
+```
+
+OLD
+
+## Facets
+
+Bring in facets - could be a demo --\> by sex
+
+## Subplots with a facet wrap
+
+An alternative approach to showing the previous plot is to separate each of the individual curves into their own subplots. This can be done with a `facet_wrap`, in which we choose a variable (i.e., a facet) by which to split the plot into individual subplots:
+
+```{r facet_wrap}
+facet_line <- line + 
+  facet_wrap(~continent) + 
+  guides(linetype = "none") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+print(facet_line)
+```
+
+A word about the colors here. While these colors are arguably distinct, it's not the case that the base colors necessarily will be. It's estimated that, "globally, 1 in 12 males and 1 in 200 females are colorblind." The most common form of color blindness is red-green color blindness. **Viridis** is a color palette with an emphasis on accessibility for those of us who experience colorblindness.
+
+To show the difference with a colorblind friendly palette, let's remake the same `facet_line` chart.
+
+```{r, facet_colorblind}
+facet_line_cb <- line + 
+  facet_wrap(~continent) + 
+  guides(linetype = "none") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_color_viridis_d()
+print(facet_line_cb)
+```
+
+Note that we have overridden the default colors from our line graph and replaced them with a colorblind friendly palette. Every line color is now clearly distinct for users.
+
+> **Challenge 4:** Open `R-Data-Visualization-Challenges.Rmd`. Create a line plot of the mean cholesterol for each age, separated by sex using the heart data. You will need to do some data manipulation with `dplyr` to make this plot. Save your plot to a variable named `D`.
+
+# Exporting
+
+Exporting graphs in R is straightforward. Start by clicking the "Export" button:
+
+1.  Click **Copy to clipboard...** if you want to quickly copy/paste a figure into a slideshow presentation or text document.
+
+2.  Click **Save as image...** (Raster/Bitmap formats such as .png, .jpeg, .tiff) if you want to explort to this format.
+
+> NOTE: Not recommended because every pixel of a plot contains its own separate coding; not so great if you want to resize the image
+
+3.  Click **Save as PDF...** (Vector format such as .pdf, .ps) to export to .pdf.
+
+> NOTE: Recommended! Every element of a plot is encoded with a function that gives its coding conditional on several factors, which makes it great for resizing.
+
+4.  Or, **export with `ggsave`**
+
+```{r eval = FALSE}
+ggsave(filename = "../images/compound.pdf",
+       plot = compound, 
+       width = 12,
+       height = 8,
+       units = "in",
+       dpi = 600)
+```
+
+> **Challenge 5:** Open `R-Data-Visualization-Challenges.Rmd`. Use `cowplot` to create a compound figure named `compound_figure` that contains subplots `A`, `B`, `C`, and `D` that you created above.
+
+# Resources for data visualization
+
+Here, we provide some useful resources that may deepen your data visualization skills:
+
+-   Wickham et al. 2019. [ggplot2](https://ggplot2.tidyverse.org/): The `ggplot2` documentation.
+
+-   [ggplot2 cheatsheet](https://rstudio.com/wp-content/uploads/2019/01/Cheatsheets_2019.pdf): A helpful cheatsheet to `ggplot2`.
+
+-   Wilke CO. 2019. [Introduction to cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html): An introductory vignette (and accompanying documentation) to `cowplot`.
+
+-   Wilke CO. 2019. [Arranging plots in a grid](https://wilkelab.org/cowplot/articles/plot_grid.html): A vignette detailing subplotting in `cowplot`.
+
+-   Tufte ER. 2001. [The Visual Display of Quantitative Information](https://www.amazon.com/Visual-Display-Quantitative-Information/dp/1930824130): One of the definitive books on data visualization.
+
+-   Wilke CO. 2019. [Fundamentals of Data Visualization](https://serialmentor.com/dataviz/): Online (i.e., free) textbook covering data visualization, written by the creator of `cowplot`.
+
+-   Wilkinson L. 1999. [The Grammar of Graphics](https://www.amazon.com/Grammar-Graphics-Statistics-Computing/dp/0387245448): A classic text on data visualization, which served as the inspiration for the structure of `ggplot2`.
+
+-   [The R Graph Gallery](https://www.r-graph-gallery.com/index.html): A handy repository of example visualizations in R.
+
+-   [Accessibility Design](https://www.storytellingwithdata.com/blog/2018/6/26/accessible-data-viz-is-better-data-viz): A nice blog post on considering accessibility in data visualization. Also consider the accessibility principles laid out in the [CFPB Design System](https://cfpb.github.io/design-system/guidelines/accessibility-principles).
