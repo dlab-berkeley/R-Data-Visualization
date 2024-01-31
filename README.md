@@ -10,8 +10,13 @@ Check D-Lab's [Learning Pathways](https://dlab-berkeley.github.io/dlab-workshops
 
 ## Workshop Goals
 
-In this workshop, we provide an introduction to data visualization in R. First, we'll cover some basics of visualization theory. Then, we'll explore how to plot data in R using `ggplot2`. We aim to cover the following types of plots:
+In this workshop, we provide an introduction to data visualization in R. First, we'll cover some basics of visualization theory. Then, we'll explore how to plot data in R using `ggplot2`. The learning objectives are:
 
+1. Identify instances when visualization helps with analysis and understanding
+2. Understand the general principles and common pitfalls of data visualization
+3. Learn the ggplot functions for creating data visualizations
+
+We will cover the following types of plots:
 * histograms
 * bar charts
 * box plots
