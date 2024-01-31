@@ -10,15 +10,14 @@ Check D-Lab's [Learning Pathways](https://dlab-berkeley.github.io/dlab-workshops
 
 ## Workshop Goals
 
-In this workshop, we provide an introduction to data visualization in R. First, we'll cover some basics of visualization theory. Then, we'll explore how to plot data in R using base R functions as well as `ggplot2`. We aim to cover the following types of plots:
+In this workshop, we provide an introduction to data visualization in R. First, we'll cover some basics of visualization theory. Then, we'll explore how to plot data in R using `ggplot2`. We aim to cover the following types of plots:
 
-* line plots
-* bar plots
+* histograms
+* bar charts
+* box plots
 * scatter plots
-* boxplots
-* heat maps
 
-We will also explore the basic grammar of graphics, including the aesthetics and geometry layers, adding statistics, transforming scales, and coloring or paneling by groups. Throughout the workshop, we'll discuss the plot types best suited for particular types of data. 
+We will also explore the basic grammar of `ggplot2`, including the aesthetics and geometry layers, adding statistics, transforming scales, and coloring or paneling by groups. Throughout the workshop, we'll discuss the plot types best suited for particular types of data. 
 
 Basic familiarity with R *is* assumed. If you are not familiar with material in [R Fundamentals](https://github.com/dlab-berkeley/R-Fundamentals), we recommend attending that workshop first.
 
@@ -48,11 +47,11 @@ Now that you have all the required software and materials, you need to run the c
 
 4. Open up the `R-Data-Visualization.Rmd` file, located in the `lessons` folder.
 
-5. If you do not have the `cowplot`, `dplyr`, `ggplot2`, and `here` packages installed, be sure to install them using the `install.packages()` function in the first code block of the `R-Data-Visualization.Rmd` file.
+5. If you do not have the `tidyverse` package installed (which includes `ggplot2 `), be sure to install it using the `install.packages()` function in the first code block of the `R-Data-Visualization.Rmd` file.
 
 6. Run a chunk of code by clicking the green "play" button in the upper right hand corner of each code chunk. Alternatively, place your cursor on a given line and press "Command + Enter" (Mac) or "Control + Enter" (PC) to run an individual line of code. 
 
-7. The file `R-Data-Visualization-Challenges.Rmd` contains space for you to work on five challenge problems. The file `R-Data-Visualization-Challenges-Solutions.Rmd` contains the solutions to these challenges. 
+7. Theere are challenges throughout the workshop. The file `solutions/solutions.R` contains the (you guessed it) solutions to these challenges.
 
 ## Is R not working on your laptop?
 
@@ -104,5 +103,6 @@ Here are other R workshops offered by the D-Lab:
 * [Evan Muzzall](https://dlab.berkeley.edu/people/evan-muzzall)
 * Lawrence Yin Tello
 * Josh Quan
+* [Hero Ashman](https://dlab.berkeley.edu/people/hero-ashman)
 
 Thanks to [Software Carpentry](http://software-carpentry.org/workshops/), Chris Paciorek, Rochelle Terman, and the [R-bootcamp](https://dlab.berkeley.edu/training/r-bootcamp-3) for inspiration.
