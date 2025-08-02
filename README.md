@@ -4,7 +4,7 @@
 
 This repository contains the materials for D-Lab's R Data Visualization workshop. 
 
-### Prerequisites
+## Prerequisites
 
 Prior experience with [R Fundamentals](https://github.com/dlab-berkeley/R-Fundamentals) is assumed.
 
