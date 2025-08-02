@@ -8,7 +8,7 @@ This repository contains the materials for D-Lab's R Data Visualization workshop
 
 Prior experience with [R Fundamentals](https://github.com/dlab-berkeley/R-Fundamentals) is assumed.
 
-Check D-Lab's [Learning Pathways](https://dlab-berkeley.github.io/dlab-workshops/R_path.html) to figure out which of our workshops to take!
+Check out D-Lab’s [Workshop Catalog](https://dlab-berkeley.github.io/dlab-workshops/) to browse all workshops, see what’s running now, and review prerequisites.
 
 ## Workshop Goals
 
