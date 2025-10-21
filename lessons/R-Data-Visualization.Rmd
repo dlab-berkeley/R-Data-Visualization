@@ -80,8 +80,12 @@ If you haven't already installed `tidyverse`, install it now by un-commenting th
 
 ```{r import, message=F, warning = F}
 # Uncomment this to install packages, if necessary.
-# install.packages("tidyverse)
-library(tidyverse)
+# install.packages("tidyverse")
+# library(tidyverse)
+
+# install.packages(c("dplyr", "ggplot2"))
+library(dplyr)
+library(ggplot2)
 ```
 
 ## Dataset details
@@ -128,9 +132,12 @@ gap |>
   filter(continent == "Europe") |>
   ggplot() +
   geom_point(aes(x = year, y = lifeExp)) +
-  xlab("Year") +
-  ylab("Life Expectancy") +
-  ggtitle("Life Expectancy in Europe") +
+  labs(x = "Year",
+  y = "Life Expectancy",
+  title = "Life Expectancy in Europe") +
+  # xlab("Year") +
+  # ylab("Life Expectancy") +
+  # ggtitle("Life Expectancy in Europe") +
   theme_bw()
 
 ```
@@ -216,9 +223,12 @@ ggplot(data = gap, aes(x = lifeExp)) +
                  fill = "gray80", 
                  bins = 30) + 
   theme_bw() + 
-  ggtitle("Histogram of Life Expectancy") + 
-  xlab("Years") + 
-  ylab("Frequency") 
+  labs(title = "Histogram of Life Expectancy",
+  x = "Years",
+  y = "Frequency")
+  # ggtitle("Histogram of Life Expectancy") + 
+  # xlab("Years") + 
+  # ylab("Frequency") 
 ```
 
 ## 🥊 Challenge 1: Histograms in ggplot()
@@ -270,9 +280,12 @@ Now that we have a dataframe with continents and the number of countries, we can
 ggplot(countries_by_continent, aes(x = continent, y = count)) +
   geom_col() + 
   theme_bw() + 
-  xlab("Continent") +
-  ylab("Number of Countries") +
-  ggtitle("Number of Countries per Continent")
+  labs(x = "Continent",
+  y = "Number of Countries",
+  title = "Number of Countries per Continent")
+  # xlab("Continent") +
+  # ylab("Number of Countries") +
+  # ggtitle("Number of Countries per Continent")
 ```
 
 `geom_col()` required us to have a variable for the y-axis (the height of the bars - in our case equal to the number of countries per continent). The geom `geom_bar()` allows us to skip the step of creating this y-axis variable, because it plots the number of rows per group as the height of each bar.
@@ -283,9 +296,12 @@ gap |>
   ggplot(aes(x = continent)) +
   geom_bar() + 
   theme_bw() + 
-  xlab("Continent") +
-  ylab("Number of Countries") +
-  ggtitle("Number of Countries per Continent")
+  labs(x = "Continent",
+  y = "Number of Countries",
+  title = "Number of Countries per Continent")
+  # xlab("Continent") +
+  # ylab("Number of Countries") +
+  # ggtitle("Number of Countries per Continent")
 
 ```
 
@@ -310,9 +326,12 @@ gap |>
   filter(year == 2007) |>
   ggplot(aes(x = continent, y = lifeExp)) + 
   geom_boxplot() +
-  ggtitle("Life Expectancy in 2007 by Continent") +
-  xlab("Continent") +
-  ylab("Life Expectancy") +
+  labs(title = "Life Expectancy in 2007 by Continent",
+  x = "Continent",
+  y = "Life Expectancy") +
+  # ggtitle("Life Expectancy in 2007 by Continent") +
+  # xlab("Continent") +
+  # ylab("Life Expectancy") +
   theme_bw()
 ```
 
@@ -397,12 +416,15 @@ gap |>
   geom_point() + 
   theme_bw() +
   # ADD A TITLE
-  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # ggtitle("GDP per capita vs. Life Expectancy in 2007") +
   # ADD AN X-AXIS AND A Y-AXIS
-  xlab("GDP per capita (dollars)") +
-  ylab("Life Expectancy (years)") +
+  # xlab("GDP per capita (dollars)") +
+  # ylab("Life Expectancy (years)") +
   # ADD SOURCE NOTES
-  labs(caption = "Source: Gap Minder")
+  labs(title = "GDP per capita vs. Life Expectancy in 2007",
+  x = "GDP per capita (dollars)",
+  y = "Life Expectancy (years)",
+  caption = "Source: Gap Minder")
  
 ```
 
@@ -422,12 +444,15 @@ gap |>
   geom_point() + 
   theme_bw() +
   # add a title
-  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # ggtitle("GDP per capita vs. Life Expectancy in 2007") +
   # add an x-axis and y-axis title
-  xlab("GDP per capita (dollars)") +
-  ylab("Life Expectancy (years)") +
+  # xlab("GDP per capita (dollars)") +
+  # ylab("Life Expectancy (years)") +
   # add source notes
-  labs(caption = "Source: Gap Minder") 
+  labs(title = "GDP per capita vs. Life Expectancy in 2007",
+  x = "GDP per capita (dollars)",
+  y = "Life Expectancy (years)",
+  caption = "Source: Gap Minder")
 
 ```
 
@@ -453,12 +478,15 @@ gap |>
   geom_point() + 
   theme_bw() +
   # add a title
-  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # ggtitle("GDP per capita vs. Life Expectancy in 2007") +
   # add an x-axis and y-axis title
-  xlab("GDP per capita (dollars)") +
-  ylab("Life Expectancy (years)") +
+  # xlab("GDP per capita (dollars)") +
+  # ylab("Life Expectancy (years)") +
   # add source notes
-  labs(caption = "Source: Gap Minder") +
+  labs(title = "GDP per capita vs. Life Expectancy in 2007",
+  x = "GDP per capita (dollars)",
+  y = "Life Expectancy (years)",
+  caption = "Source: Gap Minder") +
   # CHANGE THE X-AXIS BREAKS
   scale_x_continuous(breaks = seq(from = 0, to = 50000, by = 5000))
 
@@ -488,12 +516,15 @@ gap |>
   geom_point() + 
   theme_bw() +
   # add a title
-  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # ggtitle("GDP per capita vs. Life Expectancy in 2007") +
   # add an x-axis and y-axis title
-  xlab("GDP per capita (dollars)") +
-  ylab("Life Expectancy (years)") +
+  # xlab("GDP per capita (dollars)") +
+  # ylab("Life Expectancy (years)") +
   # add source notes
-  labs(caption = "Source: Gap Minder") +
+  labs(title = "GDP per capita vs. Life Expectancy in 2007",
+  x = "GDP per capita (dollars)",
+  y = "Life Expectancy (years)",
+  caption = "Source: Gap Minder") +
   # change the x-axis breaks AND THE LABELS
   scale_x_continuous(breaks = seq(from = 0, to = 50000, by = 5000),
                      labels = x_axis_labs)
@@ -517,12 +548,15 @@ gap |>
   geom_point() + 
   theme_bw() +
   # add a title
-  ggtitle("GDP per capita vs. Life Expectancy in 2007") +
+  # ggtitle("GDP per capita vs. Life Expectancy in 2007") +
   # add an x-axis and y-axis title
-  xlab("GDP per capita (dollars)") +
-  ylab("Life Expectancy (years)") +
+  # xlab("GDP per capita (dollars)") +
+  # ylab("Life Expectancy (years)") +
   # add source notes
-  labs(caption = "Source: Gap Minder") +
+  labs(title = "GDP per capita vs. Life Expectancy in 2007",
+  x = "GDP per capita (dollars)",
+  y = "Life Expectancy (years)",
+  caption = "Source: Gap Minder") +
   ## change the x-axis breaks and the labels
   # scale_x_continuous(breaks = seq(from = 0, to = 50000, by = 5000),
   #                    labels = x_axis_labs) +
@@ -596,16 +630,21 @@ d <- readRDS("../data/ACS_age_income.rds")
 # show it for different facets by education 
 d |>
   group_by(age, educ) |>
-  summarize(avg_income = mean(income, na.rm = T)) |>
+  summarize(avg_income = mean(income, na.rm = TRUE), .groups = "drop") |> # added .groups = "drop" to remove message
   # NOTE: we have removed education from the aes()
   ggplot(aes(x = age, y = avg_income)) +
   geom_point() +
   # NOW: create subplots by education - override default nrow to make them all in a line
-  facet_wrap(~educ, nrow = 1) +
+  # facet_wrap(~educ, nrow = 1) +
+  facet_wrap(vars(educ), nrow = 1) + # newer syntax from ggplot2
   theme_bw() +
-  ggtitle("Average Income by Age for Education Levels") +
-  xlab("Age") +
-  ylab("Avergae Income ($)")
+  labs(title = "Average Income by Age for Education Levels",
+  x = "Age",
+  y = "Average Income ($)")
+  # ggtitle("Average Income by Age for Education Levels") +
+  # xlab("Age") +
+  # ylab("Average Income ($)")
+
 
 ```
 
